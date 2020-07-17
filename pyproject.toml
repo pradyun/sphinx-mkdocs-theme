@@ -1,0 +1,23 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "sphinx-mkdocs-theme"
+author = "Pradyun Gedam"
+author-email = "mail@pradyunsg.me"
+home-page = "https://github.com/pradyunsg/sphinx-mkdocs-theme"
+description-file = "README.md"
+requires-python = ">=3.5"
+requires = ["sphinx"]
+
+[tool.flit.metadata.requires-extra]
+test = [
+  "pytest",
+  "pytest-cov",
+  "pytest-xdist",
+]
+doc = []
+
+[tool.flit.entrypoints]
+"sphinx.html_themes" = {sphinx-mkdocs-theme = "sphinx-mkdocs-theme"}
