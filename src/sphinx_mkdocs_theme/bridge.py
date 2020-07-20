@@ -20,7 +20,7 @@ class MkDocsTemplateBridge(TemplateBridge):
     """
 
     def init(self, builder, theme, dirs=None):
-        assert theme.name == "mkdocs"
+        pass  # no-op
 
     def actually_init(self, app):
         self.mkdocs_theme = MkDocsTheme(app.config.mkdocs_theme)
