@@ -241,7 +241,7 @@ class ContextTranslator:
         if pagename.endswith("index"):
             url = pagename[:-6]
         else:
-            url = pagename + ".html"
+            url = pagename + "/"
 
         page = Page(
             title=self.sphinx_context.get("title", None),
