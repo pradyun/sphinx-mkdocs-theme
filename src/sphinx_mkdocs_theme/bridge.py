@@ -22,10 +22,11 @@ class MkDocsTemplateBridge(TemplateBridge):
     def init(self, builder, theme, dirs=None):
         assert theme.name == "mkdocs"
 
-    def actually_init(self, app, mkdocs_theme):
-        self._theme = mkdocs_theme
-        self._environment = mkdocs_theme.get_env()
-        self._translator = ContextTranslator(app, self._theme)
+    def actually_init(self, app):
+        self.mkdocs_theme = MkDocsTheme(app.config.mkdocs_theme)
+
+        self._environment = self.mkdocs_theme.get_env()
+        self._translator = ContextTranslator(app, self.mkdocs_theme)
 
     def render(self, template, context):
         try:
@@ -48,7 +49,7 @@ class MkDocsTemplateBridge(TemplateBridge):
             )
 
     def newest_template_mtime(self) -> float:
-        return max(mtimes_of_files(self._theme.dirs, ".html"))
+        return max(mtimes_of_files(self.mkdocs_theme.dirs, ".html"))
 
 
 class EventHandler:
@@ -102,7 +103,7 @@ class EventHandler:
         # Operating Premise
         #     Accessing TemplateBridge as app.builder.templates and this is called
         #     *after* the template bridge has been initialized.
-        app.builder.templates.actually_init(app, self._theme)
+        app.builder.templates.actually_init(app)
 
         # Only generate the search page if requested.
         app.builder.search = self._theme["include_search_page"]
