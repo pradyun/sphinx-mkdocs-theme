@@ -104,7 +104,7 @@ class ContextTranslator:
         self.indexer = None
         if app.builder.search:
             self.indexer = SearchIndex(
-                prebuild_index="python", lang=app.config.language
+                prebuild_index="python", lang=app.config.language or "en"
             )
 
     def translate(self, sphinx_context, template_name):
@@ -151,11 +151,18 @@ class ContextTranslator:
 
     # https://mkdocs.readthedocs.io/en/latest/user-guide/custom-themes/#config
     def get_config(self):
-        theme_config, extra_config = self._convert_sphinx_theme_config()
+        theme = self._convert_sphinx_theme_config()
+        extra = theme.pop("extra", {})
+        plugins = theme.pop("plugins", [])
+        google_analytics = theme.pop("google_analytics", None)
+
+        if self.indexer:
+            plugins.append("search")
 
         return {
-            "extra": extra_config,
-            "theme": theme_config,
+            "theme": theme,
+            "extra": extra,
+            "plugins": plugins,
             "copyright": "Copyright &copy; " + self.sphinx_context["copyright"],
             "site_name": self.sphinx_context["docstitle"],
             "site_author": self.app.config.author,
@@ -165,13 +172,12 @@ class ContextTranslator:
             "repo_url": None,
             "repo_name": None,
             # no need to do this IMO
-            "google_analytics": None,
+            "google_analytics": google_analytics,
         }
 
     def _convert_sphinx_theme_config(self):
         """Convert Sphinx's theme_* variables into mkdocs' `theme` object."""
         theme_config = {}
-        extra_config = {}
 
         for key in self.theme:
             theme_config[key] = self.theme[key]
@@ -183,15 +189,12 @@ class ContextTranslator:
                 continue
 
             name = key[len(prefix) :]
-            if name == "extra":
-                extra_config = value
-            else:
-                theme_config[name] = value
+            theme_config[name] = value
 
         if self.sphinx_context["language"]:
             theme_config["language"] = self.sphinx_context["language"]
 
-        return theme_config, extra_config
+        return theme_config
 
     # https://mkdocs.readthedocs.io/en/latest/user-guide/custom-themes/#nav
     def get_site_navigation(self):
@@ -247,6 +250,8 @@ class ContextTranslator:
             url = pagename[:-6]
         else:
             url = pagename + "/"
+
+        toc = self.sphinx_context["toc"]
 
         page = Page(
             title=self.sphinx_context.get("title", None),
