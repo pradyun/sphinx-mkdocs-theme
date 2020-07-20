@@ -114,11 +114,3 @@ class EventHandler:
 
         for path in []:
             yield (pagename, {"content": content}, _STATIC_FILE_INDICATOR)
-
-    # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-html-page-context
-    def handle_page_context(self, app, pagename, templatename, context, doctree):
-        if app.config.html_theme != "mkdocs":
-            # Do nothing if this is not used with the "mkdocs" theme.
-            return
-
-        return "main.html"

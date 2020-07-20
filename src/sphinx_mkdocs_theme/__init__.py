@@ -18,4 +18,3 @@ def setup(app):
     app.connect("config-inited", handler.handle_config_inited)
     app.connect("builder-inited", handler.handle_builder_inited)
     app.connect("html-collect-pages", handler.handle_collect_pages)
-    app.connect("html-page-context", handler.handle_page_context)
