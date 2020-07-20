@@ -30,8 +30,8 @@ class MkDocsTemplateBridge(TemplateBridge):
 
     def render(self, template, context):
         try:
-            render_context = self._translator.translate(context)
-            return self._environment.get_template(template).render(render_context)
+            context, template = self._translator.translate(context, template)
+            return self._environment.get_template(template).render(context)
         except Exception:
             return (
                 "Error occurred in MkDocsTemplateBridge.render()\n"
@@ -40,8 +40,8 @@ class MkDocsTemplateBridge(TemplateBridge):
 
     def render_string(self, source, context):
         try:
-            render_context = self._translator.translate(context)
-            return self._environment.from_string(source).render(render_context)
+            context, _ = self._translator.translate(context, template_name=None)
+            return self._environment.from_string(source).render(context)
         except Exception:
             return (
                 "Error occurred in MkDocsTemplateBridge.render_string()\n"

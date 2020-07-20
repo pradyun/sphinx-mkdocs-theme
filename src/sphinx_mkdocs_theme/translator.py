@@ -89,9 +89,14 @@ class ContextTranslator:
         self.app = app
         self.theme = theme
         self.sphinx_context = None
+        self.template_name = None
 
-    def translate(self, sphinx_context):
+    def translate(self, sphinx_context, template_name):
         self.sphinx_context = sphinx_context
+        if template_name == "page.html":
+            self.template_name = "main.html"
+        else:
+            self.template_name = template_name
 
         config = self.get_config()
         nav = self.get_site_navigation()
@@ -124,7 +129,7 @@ class ContextTranslator:
             # Because, Sphinx makes assumptions internally
             "encoding": sphinx_context["encoding"],
         }
-        return mkdocs_context
+        return mkdocs_context, self.template_name
 
     # https://mkdocs.readthedocs.io/en/latest/user-guide/custom-themes/#config
     def get_config(self):
