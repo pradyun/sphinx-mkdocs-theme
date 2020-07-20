@@ -88,11 +88,9 @@ class ContextTranslator:
     def __init__(self, app, theme):
         self.app = app
         self.theme = theme
-        self.template_name = None
         self.sphinx_context = None
 
-    def translate(self, template_name, sphinx_context):
-        self.template_name = template_name
+    def translate(self, sphinx_context):
         self.sphinx_context = sphinx_context
 
         config = self.get_config()

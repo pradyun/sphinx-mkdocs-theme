@@ -24,16 +24,15 @@ class MkDocsTemplateBridge(TemplateBridge):
     def init(self, builder, theme, dirs=None):
         assert theme.name == "mkdocs"
 
-    def actually_init(self, mkdocs_theme):
+    def actually_init(self, app, mkdocs_theme):
         self._theme = mkdocs_theme
         self._environment = mkdocs_theme.get_env()
-
-        # TODO: Patch the "url" filter, to actually use sphinx's topath maybe?
-        #       NOTE: seems like if we manage page.url correctly, it'll be fine.
+        self._translator = ContextTranslator(app, self._theme)
 
     def render(self, template, context):
         try:
-            return self._environment.get_template(template).render(context)
+            render_context = self._translator.translate(context)
+            return self._environment.get_template(template).render(render_context)
         except Exception:
             return (
                 "Error occurred in MkDocsTemplateBridge.render()\n"
@@ -42,7 +41,8 @@ class MkDocsTemplateBridge(TemplateBridge):
 
     def render_string(self, source, context):
         try:
-            return self._environment.from_string(source).render(context)
+            render_context = self._translator.translate(context)
+            return self._environment.from_string(source).render(render_context)
         except Exception:
             return (
                 "Error occurred in MkDocsTemplateBridge.render_string()\n"
@@ -91,7 +91,6 @@ class EventHandler:
             )
 
         self._theme = MkDocsTheme(app.config.mkdocs_theme)
-        self._translator = ContextTranslator(app, self._theme)
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-builder-inited
     def handle_builder_inited(self, app):
@@ -101,7 +100,7 @@ class EventHandler:
         # Operating Premise
         #     Accessing TemplateBridge as app.builder.templates and this is called
         #     *after* the template bridge has been initialized.
-        app.builder.templates.actually_init(self._theme)
+        app.builder.templates.actually_init(app, self._theme)
 
         # No need to generate
         app.config.html_use_index = False
@@ -125,11 +124,4 @@ class EventHandler:
     def handle_page_context(self, app, pagename, templatename, context, doctree):
         if not self._theme:
             return
-
-        # We have to return the same object, so we use a copy for the
-        # translation, and replace the original inline.
-        mkdocs_context = self._translator.translate(templatename, context.copy())
-        context.clear()
-        context.update(mkdocs_context)
-
         return "main.html"
