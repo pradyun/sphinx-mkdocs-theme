@@ -23,6 +23,16 @@ class MkDocsTemplateBridge(TemplateBridge):
     def init(self, builder, theme, dirs=None):
         pass  # no-op
 
+    @property
+    def translator(self):
+        assert hasattr(self, "_translator"), "WHAT."
+        return self._translator
+
+    @property
+    def environment(self):
+        assert hasattr(self, "_environment"), "WHAT."
+        return self._environment
+
     def actually_init(self, app):
         user_provided = app.config.mkdocs_theme
 
