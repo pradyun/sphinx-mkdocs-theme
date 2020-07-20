@@ -8,8 +8,7 @@ author = "Pradyun Gedam"
 author-email = "mail@pradyunsg.me"
 home-page = "https://github.com/pradyunsg/sphinx-mkdocs-theme"
 description-file = "README.md"
-requires-python = ">=3.5"
-requires = ["sphinx"]
+requires-python = ">=3.8"
 
 [tool.flit.metadata.requires-extra]
 test = [
