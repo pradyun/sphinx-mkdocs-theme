@@ -104,7 +104,10 @@ class ContextTranslator:
         self.indexer = None
         if app.builder.search:
             self.indexer = SearchIndex(
-                prebuild_index="python", lang=app.config.language or "en"
+                prebuild_index="python",
+                lang=app.config.language or ["en"],
+                site_dir=app.builder.outdir,
+                theme={},  # it only checks "search_index_only", which we don't set
             )
 
     def translate(self, sphinx_context, template_name):

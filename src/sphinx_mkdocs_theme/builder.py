@@ -16,6 +16,7 @@ from sphinx.builders.html import (
     movefile,
 )
 from sphinx.builders.dirhtml import DirectoryHTMLBuilder
+from mkdocs.contrib.search import SearchPlugin as MkDocsSearchPlugin
 
 from .bridge import MkDocsTemplateBridge
 
@@ -27,7 +28,7 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
     """
 
     name = "mkdocs"
-    searchindex_filename = "search_index.json"
+    searchindex_filename = os.path.join("search", "search_index.json")
 
     def get_builder_config(self, option, default):
         if (option, default) == ("use_index", "html"):
@@ -109,7 +110,7 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
 
         translator = self.templates.translator
         if translator.indexer:
-            self.finish_tasks.add_task(self.dump_search_index)
+            self.finish_tasks.add_task(self.dump_search_files)
 
     def copy_theme_static_files(self, context) -> None:
         """Mimic mkdocs's theme asset copy behavior."""
@@ -163,12 +164,11 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
                     result = renderer.render_string(source_text, context)
                     fdst.write(result)
 
-    def dump_search_index(self) -> None:
+    def dump_search_files(self) -> None:
         indexer = self.templates.translator.indexer
-        search_index = indexer.generate_search_index()
 
-        # Perform an "atomic" write -- write to a different file then move.
-        filename = os.path.join(self.outdir, self.searchindex_filename)
-        with open(filename + ".tmp", "w", encoding="utf-8") as file:
-            file.write(search_index)
-        movefile(filename + ".tmp", filename)
+        # HACK: Yes, I felt dirty after writing this.
+        plugin = MkDocsSearchPlugin()
+        plugin.search_index = indexer
+        plugin.config = indexer.config
+        plugin.on_post_build(indexer.config)
