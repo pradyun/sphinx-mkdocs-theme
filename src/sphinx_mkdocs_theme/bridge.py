@@ -21,20 +21,7 @@ class MkDocsTemplateBridge(TemplateBridge):
     """
 
     def init(self, builder, theme, dirs=None):
-        pass  # no-op
-
-    @property
-    def translator(self):
-        assert hasattr(self, "_translator"), "WHAT."
-        return self._translator
-
-    @property
-    def environment(self):
-        assert hasattr(self, "_environment"), "WHAT."
-        return self._environment
-
-    def actually_init(self, app):
-        user_provided = app.config.mkdocs_theme
+        user_provided = builder.app.config.mkdocs_theme
 
         # Check that the theme actually exists.
         theme_entry_points = entry_points()["mkdocs.themes"]
@@ -47,7 +34,23 @@ class MkDocsTemplateBridge(TemplateBridge):
         self.mkdocs_theme = MkDocsTheme(user_provided)
 
         self._environment = self.mkdocs_theme.get_env()
-        self._translator = ContextTranslator(app, self.mkdocs_theme)
+        self._translator = ContextTranslator(builder.app, self.mkdocs_theme)
+
+        # TODO: add in configuration from mkdocs_theme into the
+        # RawConfigParser at theme.config
+        for key in self.mkdocs_theme:
+            value = self.mkdocs_theme[key]
+            theme.config.set("options", key, value)
+
+    @property
+    def translator(self):
+        assert hasattr(self, "_translator"), "WHAT."
+        return self._translator
+
+    @property
+    def environment(self):
+        assert hasattr(self, "_environment"), "WHAT."
+        return self._environment
 
     def render(self, template, context):
         try:

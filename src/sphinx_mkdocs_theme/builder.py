@@ -39,7 +39,6 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
 
     def init_templates(self) -> None:
         super().init_templates()
-        self.templates.actually_init(self.app)
 
     def init_js_files(self) -> None:
         # Drops hard-coded JS files and special handling of translations.js
