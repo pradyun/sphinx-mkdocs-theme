@@ -8,6 +8,7 @@ from importlib.metadata import entry_points
 
 from mkdocs.theme import Theme as MkDocsTheme
 from sphinx.application import TemplateBridge
+from sphinx.errors import ExtensionError
 from sphinx.util import mtimes_of_files
 
 from .translator import ContextTranslator
@@ -23,7 +24,17 @@ class MkDocsTemplateBridge(TemplateBridge):
         pass  # no-op
 
     def actually_init(self, app):
-        self.mkdocs_theme = MkDocsTheme(app.config.mkdocs_theme)
+        user_provided = app.config.mkdocs_theme
+
+        # Check that the theme actually exists.
+        theme_entry_points = entry_points()["mkdocs.themes"]
+        available_themes = {ep.name: ep.value for ep in theme_entry_points}
+        if user_provided not in available_themes:
+            raise ExtensionError(
+                "Could not find mkdocs theme named: {}".format(user_provided)
+            )
+
+        self.mkdocs_theme = MkDocsTheme(user_provided)
 
         self._environment = self.mkdocs_theme.get_env()
         self._translator = ContextTranslator(app, self.mkdocs_theme)
@@ -68,14 +79,6 @@ class EventHandler:
         user_provided = app.config.mkdocs_theme
         if user_provided is None:
             raise Exception("Did not get mkdocs_theme from conf.py")
-
-        # Check that the theme actually exists.
-        theme_entry_points = entry_points()["mkdocs.themes"]
-        available_themes = {ep.name: ep.value for ep in theme_entry_points}
-        if user_provided not in available_themes:
-            raise Exception(
-                "Could not find mkdocs theme named: {}".format(user_provided)
-            )
 
         # Hook in the compatibility TemplateBridge.
         if config.template_bridge is None:
