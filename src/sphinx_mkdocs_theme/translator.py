@@ -8,6 +8,8 @@ from types import SimpleNamespace
 
 import bs4
 import mkdocs
+from mkdocs.contrib.search import SearchIndex
+
 import sphinx
 import sphinx_mkdocs_theme as this_project
 
@@ -81,6 +83,7 @@ def flatten_toctree(toctree):
     # TODO: write this properly?
     return []
 
+
 #
 # The main attraction!
 #
@@ -88,8 +91,15 @@ class ContextTranslator:
     def __init__(self, app, theme):
         self.app = app
         self.theme = theme
+
         self.sphinx_context = None
         self.template_name = None
+
+        self.indexer = None
+        if app.builder.search:
+            self.indexer = SearchIndex(
+                prebuild_index="python", lang=app.config.language
+            )
 
     def translate(self, sphinx_context, template_name):
         self.sphinx_context = sphinx_context
@@ -103,7 +113,10 @@ class ContextTranslator:
         all_pages = self.get_all_pages()
         page = self.get_page_details()
 
-        # TODO: figure out how this interacts with the mkdocs2 stuff?
+        if self.indexer:
+            self.indexer.add_entry_from_context(page)
+
+        # TODO: figure out how this interacts with the mkdocs url stuff?
         base_url = "."
         extra_css = sphinx_context["css_files"]
         extra_javascript = sphinx_context["script_files"]
@@ -138,7 +151,7 @@ class ContextTranslator:
         return {
             "extra": extra_config,
             "theme": theme_config,
-            "copyright": self.sphinx_context["copyright"],
+            "copyright": "Copyright &copy; " + self.sphinx_context["copyright"],
             "site_name": self.sphinx_context["docstitle"],
             "site_author": self.app.config.author,
             # TODO: figure out the rest!
