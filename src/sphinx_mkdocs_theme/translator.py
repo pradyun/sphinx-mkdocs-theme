@@ -80,9 +80,15 @@ def convert_toctree(html):
 
 
 def flatten_toctree(toctree):
-    # TODO: write this properly?
-    return []
+    retval = []
+    to_process = toctree[:]
+    while to_process:
+        current = to_process.pop()
+        retval.append(current)
 
+        if current.children:
+            to_process.extend(current.children)
+    return retval
 
 #
 # The main attraction!
