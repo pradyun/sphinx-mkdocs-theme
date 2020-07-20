@@ -95,7 +95,8 @@ class EventHandler:
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-builder-inited
     def handle_builder_inited(self, app):
-        if not self._theme:
+        if app.config.html_theme != "mkdocs":
+            # Do nothing if this is not used with the "mkdocs" theme.
             return
 
         # Operating Premise
@@ -108,7 +109,8 @@ class EventHandler:
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-html-collect-pages
     def handle_collect_pages(self, app):
-        if not self._theme:
+        if app.config.html_theme != "mkdocs":
+            # Do nothing if this is not used with the "mkdocs" theme.
             return
 
         # TODO: handle self._theme.static_templates?
@@ -120,6 +122,8 @@ class EventHandler:
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-html-page-context
     def handle_page_context(self, app, pagename, templatename, context, doctree):
-        if not self._theme:
+        if app.config.html_theme != "mkdocs":
+            # Do nothing if this is not used with the "mkdocs" theme.
             return
+
         return "main.html"
