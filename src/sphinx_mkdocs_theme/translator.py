@@ -122,8 +122,7 @@ class ContextTranslator:
         if self.indexer:
             self.indexer.add_entry_from_context(page)
 
-        # TODO: figure out how this interacts with the mkdocs url stuff?
-        base_url = "."
+        base_url = "."  # HACK: somehow, this works?
         extra_css = sphinx_context["css_files"]
         extra_javascript = sphinx_context["script_files"]
 
