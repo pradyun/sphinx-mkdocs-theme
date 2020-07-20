@@ -14,8 +14,6 @@ from .translator import ContextTranslator
 
 __all__ = ["MkDocsTemplateBridge", "EventHandler"]
 
-_STATIC_FILE_INDICATOR = "<static>"
-
 
 class MkDocsTemplateBridge(TemplateBridge):
     """A TemplateBridge that uses the mkdocs theme's Jinja2 environment for rendering.
@@ -90,6 +88,9 @@ class EventHandler:
                 f"Cannot be used with `template_bridge` set: {config.template_bridge}"
             )
 
+        # No need to generate the index.
+        app.config.html_use_index = False
+
         self._theme = MkDocsTheme(app.config.mkdocs_theme)
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-builder-inited
@@ -102,10 +103,8 @@ class EventHandler:
         #     *after* the template bridge has been initialized.
         app.builder.templates.actually_init(app, self._theme)
 
-        # No need to generate
-        app.config.html_use_index = False
-        app.builder.search = False
-        # app.config.html_use_index = False
+        # Only generate the search page if requested.
+        app.builder.search = self._theme["include_search_page"]
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-html-collect-pages
     def handle_collect_pages(self, app):
@@ -118,7 +117,6 @@ class EventHandler:
 
         for path in []:
             yield (pagename, {"content": content}, _STATIC_FILE_INDICATOR)
-
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-html-page-context
     def handle_page_context(self, app, pagename, templatename, context, doctree):
