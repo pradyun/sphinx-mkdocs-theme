@@ -58,10 +58,6 @@ class EventHandler:
     The methods are ordered in the order that they would have their first-calls.
     """
 
-    def __init__(self):
-        self._theme: MkDocsTheme = None
-        self._translator = None
-
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-config-inited
     def handle_config_inited(self, app, config):
         if config.html_theme != "mkdocs":
@@ -92,8 +88,6 @@ class EventHandler:
         # No need to generate the index.
         app.config.html_use_index = False
 
-        self._theme = MkDocsTheme(app.config.mkdocs_theme)
-
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-builder-inited
     def handle_builder_inited(self, app):
         if app.config.html_theme != "mkdocs":
@@ -106,7 +100,7 @@ class EventHandler:
         app.builder.templates.actually_init(app)
 
         # Only generate the search page if requested.
-        app.builder.search = self._theme["include_search_page"]
+        app.builder.search = app.builder.templates.mkdocs_theme["include_search_page"]
 
     # https://www.sphinx-doc.org/en/3.x/extdev/appapi.html#event-html-collect-pages
     def handle_collect_pages(self, app):
