@@ -153,13 +153,13 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
             parent_dir = os.path.dirname(destination)
 
             # HACK: We only "render" template-y files.
-            if "templates" not in path:
+            if "templates" not in location:
                 copy_asset(source, os.path.dirname(destination))
                 continue
 
             os.makedirs(parent_dir, exist_ok=True)
-            with open(source, "rb") as fsrc:
-                with open(destination, "wb", encoding="utf-8") as fdst:
+            with open(source, "r") as fsrc:
+                with open(destination, "w", encoding="utf-8") as fdst:
                     source_text = fsrc.read()
                     result = renderer.render_string(source_text, context)
                     fdst.write(result)
