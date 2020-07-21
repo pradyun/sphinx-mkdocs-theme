@@ -38,9 +38,6 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
     def create_template_bridge(self) -> None:
         self.templates = MkDocsTemplateBridge()
 
-    def init_templates(self) -> None:
-        super().init_templates()
-
     def init_js_files(self) -> None:
         # Drops hard-coded JS files and special handling of translations.js
         for filename, attrs in self.app.registry.js_files:
@@ -98,7 +95,6 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
         copy_asset(os.path.join(self.confdir, self.config.html_favicon), self.outdir)
 
     def finish(self) -> None:
-        # no index generation!
         self.finish_tasks.add_task(self.gen_pages_from_extensions)
         self.finish_tasks.add_task(self.gen_additional_pages)
         self.finish_tasks.add_task(self.copy_image_files)
@@ -108,6 +104,7 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
         self.finish_tasks.add_task(self.write_buildinfo)
         self.finish_tasks.add_task(self.dump_inventory)
 
+        # We want our own search index.
         translator = self.templates.translator
         if translator.indexer:
             self.finish_tasks.add_task(self.dump_search_files)
