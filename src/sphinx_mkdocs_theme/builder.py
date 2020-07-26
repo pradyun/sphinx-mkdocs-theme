@@ -46,6 +46,10 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
         for filename, attrs in self.get_builder_config("js_files", "html"):
             self.add_js_file(filename, **attrs)
 
+    def init_highlighter(self) -> None:
+        super().init_highlighter()
+        # This line took 73 minutes of digging through Sphinx/MkDocs/Docutils sources.
+        self.highlighter.formatter_args["wrapcode"] = True
     #
     # We don't create the _static directory!
     #
