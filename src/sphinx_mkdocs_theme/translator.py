@@ -204,7 +204,7 @@ class ContextTranslator:
         toctree = self.sphinx_context["toctree"]
 
         nav_html = toctree(
-            maxdepth=2, includehidden=False, collapse=False, titles_only=True,
+            maxdepth=2, includehidden=True, collapse=False, titles_only=True,
         )
         items = convert_toctree(nav_html)
         pages = flatten_toctree(items)
@@ -238,7 +238,7 @@ class ContextTranslator:
         toctree = self.sphinx_context["toctree"]
 
         all_pages_html = toctree(
-            maxdepth=-1, includehidden=False, collapse=False, titles_only=True,
+            maxdepth=-1, includehidden=True, collapse=False, titles_only=True,
         )
         items = convert_toctree(all_pages_html)
         return flatten_toctree(items)
