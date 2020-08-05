@@ -57,8 +57,9 @@ def convert_toctree(html):
         # Nothing to do with strings here.
         if isinstance(element, str):
             continue
+        # TODO: handle captions
+        # <p class="caption"><span class="caption-text">Top Level</span></p>
         if element.name != "ul":
-            print(element)
             continue
         retval.extend(_handle_ul_in_toctree(element))
     return retval
