@@ -14,12 +14,6 @@ import sphinx
 import sphinx_mkdocs_theme as this_project
 
 
-# from mkdocs.structure.files import File, Files
-# from mkdocs.structure.nav import Navigation
-# from mkdocs.structure.pages import Page
-# from mkdocs.structure.toc import TableOfContents
-# from mkdocs.theme import Theme
-
 __all__ = ["ContextTranslator"]
 
 #
