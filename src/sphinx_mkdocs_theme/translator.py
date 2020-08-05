@@ -12,6 +12,7 @@ from mkdocs.contrib.search import SearchIndex
 
 import sphinx
 import sphinx_mkdocs_theme as this_project
+from .model import Navigation
 
 
 __all__ = ["ContextTranslator"]
@@ -20,16 +21,6 @@ __all__ = ["ContextTranslator"]
 # HTML Processing!
 #
 Link = Section = Page = SimpleNamespace
-
-
-class Nav(SimpleNamespace):
-
-    def __init__(self, items, **kwargs):
-        self._items = items
-        super().__init__(**kwargs)
-
-    def __iter__(self):
-        return iter(self._items)
 
 
 def _handle_ul_in_toctree(ul_element, parent=None):
@@ -224,8 +215,7 @@ class ContextTranslator:
             is_page=True,
             is_link=False,
         )
-
-        return Nav(items, homepage=homepage, pages=pages)
+        return Navigation(items, homepage=homepage, pages=pages)
 
     # https://mkdocs.readthedocs.io/en/latest/user-guide/custom-themes/#pages
     def get_all_pages(self):
