@@ -172,4 +172,8 @@ class MkDocsBuilder(DirectoryHTMLBuilder):
         plugin = MkDocsSearchPlugin()
         plugin.search_index = indexer
         plugin.config = indexer.config
-        plugin.on_post_build(indexer.config)
+
+        try:
+            plugin.on_post_build(indexer.config)
+        except ZeroDivisionError:
+            raise Exception("FATAL (sphinx-mkdocs-theme): Document URLs are incorrect.")
